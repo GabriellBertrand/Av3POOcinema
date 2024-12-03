@@ -16,13 +16,13 @@ public class TesteGenero {
             System.out.print("Escolha uma opção: ");
 
             int opcao = scanner.nextInt();
-            scanner.nextLine(); // Limpa o buffer
+            scanner.nextLine(); r
 
             switch (opcao) {
-                case 1: // Cadastrar
+                case 1: 
                     System.out.print("Digite o ID do gênero: ");
                     int id = scanner.nextInt();
-                    scanner.nextLine(); // Limpa o buffer
+                    scanner.nextLine();
                     System.out.print("Digite a descrição do gênero: ");
                     String desc = scanner.nextLine();
                     System.out.print("Digite o status do gênero: ");
@@ -31,7 +31,7 @@ public class TesteGenero {
                     novoGenero.cadastrar();
                     break;
 
-                case 2: // Consultar
+                case 2:
                     System.out.print("Digite a descrição do gênero a ser consultado: ");
                     String consultaDesc = scanner.nextLine();
                     Genero encontrado = genero.consultar(consultaDesc);
@@ -45,10 +45,10 @@ public class TesteGenero {
                     }
                     break;
 
-                case 3: // Editar
+                case 3: 
                     System.out.print("Digite o ID do gênero a ser editado: ");
                     int idEditar = scanner.nextInt();
-                    scanner.nextLine(); // Limpa o buffer
+                    scanner.nextLine();
                     System.out.print("Digite a nova descrição: ");
                     String novaDesc = scanner.nextLine();
                     System.out.print("Digite o novo status: ");
@@ -57,7 +57,7 @@ public class TesteGenero {
                     genero.editar(generoEditado);
                     break;
 
-                case 4: // Listar
+                case 4: 
                     ArrayList<Genero> generos = Genero.listar();
                     System.out.println("Lista de Gêneros:");
                     for (Genero g : generos) {
@@ -65,7 +65,7 @@ public class TesteGenero {
                     }
                     break;
 
-                case 5: // Sair
+                case 5: 
                     System.out.println("Saindo...");
                     scanner.close();
                     return;
