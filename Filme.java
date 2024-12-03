@@ -1,5 +1,7 @@
 import java.io.BufferedReader;
+import java.io.BufferedWriter;
 import java.io.FileReader;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.util.ArrayList;
 
@@ -10,12 +12,20 @@ public class Filme {
     private Genero genero;
     private String status;
 
-    public Filme(int id, Genero g, String t, int cl, String st) {
-        this.idFilme = id;
-        this.titulo = t;
-        this.classificacao = cl;
-        this.genero = g;
-        this.status = st;
+    public Filme(int idFilme, String titulo, int classificacao, Genero genero, String status) {
+        this.idFilme = idFilme;
+        this.titulo = titulo;
+        this.classificacao = classificacao;
+        this.genero = genero != null ? genero : new Genero();
+        this.status = status;
+    }
+
+    public Filme() {
+        this.idFilme = 0;
+        this.titulo = "";
+        this.classificacao = 0;
+        this.genero = new Genero();
+        this.status = "";
     }
 
     public int getId() {
@@ -52,38 +62,94 @@ public class Filme {
     public void setStatus(String status) {
         this.status = status;
     }
-
+//////////////////////////////////////////////////////////
     public boolean cadastrar() {
-        System.out.println("Filme inserido com sucesso.");
-        return true;
-    }
-
-    public static Filme consultar(String titulo) {
-        if ("filme".equalsIgnoreCase(titulo)) {
-            return new Filme(1, new Genero(01, "Ação", "A"),"Velozes & Furiosos", 16, "A");
+        try (FileWriter fw = new FileWriter("filme.txt", true);
+             BufferedWriter write = new BufferedWriter(fw)) {
+            if (consultar(this.idFilme).getId() == 0) {
+                write.write(this.getId() + ";" + this.getTitulo() + ";" + this.getClassificacao() + ";" + this.getGenero().getId() + ";" + this.getStatus() + ";");
+                write.newLine();
+                System.out.println("Filme cadastrado com sucesso");
+                return true;
+            } else {
+                System.out.println("Filme já existente");
+                return false;
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+            return false;
         }
-        return null;
     }
-
-    public boolean editar() {
-        this.titulo = "Novo Título";
-        System.out.println("Filme editado com sucesso.");
-        return true;
-    }
-
-    ArrayList<Ator> listar() {
-        ArrayList<Filme> filmes = new ArrayList<>();
-
-        try (BufferedReader reader = new BufferedReader(new FileReader("   "))) {
+//////////////////////////////////////////////////////////
+    public Filme consultar(int idFilme) {
+        Filme filme = new Filme();
+        try (FileReader fr = new FileReader("filme.txt");
+             BufferedReader reader = new BufferedReader(fr)) {
             String linha;
             while ((linha = reader.readLine()) != null) {
                 String[] dados = linha.split(";");
-                int idFilme = Integer.parseInt(dados[0]);
-                String titulo = dados[1];
-                int classificacao = dados[2];
-                Genero genero = dados[3];
-                String status = dados[4];
-                filmes.add(new Filme(idFilme, titulo, classificacao, genero, status));
+                if (Integer.parseInt(dados[0]) == idFilme) {
+                    Genero genero = new Genero(Integer.parseInt(dados[3]), "", "");
+                    filme = new Filme(Integer.parseInt(dados[0]), dados[1], Integer.parseInt(dados[2]), genero, dados[4]);
+                    break;
+                }
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return filme;
+    }
+//////////////////////////////////////////////////////////
+    public boolean editar(Filme novoFilme) {
+        ArrayList<Filme> filmes = new ArrayList<>();
+        boolean encontrado = false;
+
+        try (FileReader fr = new FileReader("filme.txt");
+             BufferedReader reader = new BufferedReader(fr)) {
+            String linha;
+            while ((linha = reader.readLine()) != null) {
+                String[] dados = linha.split(";");
+                Filme filme = new Filme(Integer.parseInt(dados[0]), dados[1], Integer.parseInt(dados[2]), new Genero(Integer.parseInt(dados[3]), "", ""), dados[4]);
+                if (filme.getId() == novoFilme.getId()) {
+                    filmes.add(novoFilme);
+                    encontrado = true;
+                } else {
+                    filmes.add(filme);
+                }
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+            return false;
+        }
+        if (!encontrado) {
+            System.out.println("Filme com ID " + novoFilme.getId() + " não encontrado.");
+            return false;
+        }
+        try (FileWriter fw = new FileWriter("filme.txt");
+             BufferedWriter writer = new BufferedWriter(fw)) {
+            for (Filme filme : filmes) {
+                writer.write(filme.getId() + ";" + filme.getTitulo() + ";" + filme.getClassificacao() + ";" + filme.getGenero().getId() + ";" + filme.getStatus() + ";");
+                writer.newLine();
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+            return false;
+        }
+        System.out.println("Filme editado com sucesso.");
+        return true;
+    }
+//////////////////////////////////////////////////////////
+    public static ArrayList<Filme> listar() {
+        ArrayList<Filme> filmes = new ArrayList<>();
+
+        try (FileReader fr = new FileReader("filme.txt");
+             BufferedReader reader = new BufferedReader(fr)) {
+            String linha;
+            while ((linha = reader.readLine()) != null) {
+                String[] dados = linha.split(";");
+                Genero genero = new Genero(Integer.parseInt(dados[3]), "", "");
+                Filme filme = new Filme(Integer.parseInt(dados[0]), dados[1], Integer.parseInt(dados[2]), genero, dados[4]);
+                filmes.add(filme);
             }
         } catch (IOException e) {
             e.printStackTrace();
@@ -91,5 +157,4 @@ public class Filme {
 
         return filmes;
     }
-
 }

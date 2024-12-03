@@ -1,0 +1,3 @@
+1;Basico;Ativo
+2;VIP;Ativo
+3;Especial;Inativo
